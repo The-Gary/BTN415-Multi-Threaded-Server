@@ -35,5 +35,8 @@ x64/
 *.sln
 *.vcxproj
 *.filters
-*.users
+*.user
 .vs/
+Debug/
+*.vcxproj.filters
+*.vcxproj.user

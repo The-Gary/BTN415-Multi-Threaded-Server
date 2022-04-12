@@ -2,6 +2,7 @@
 #define PLAYER_H
 #include <string>
 #include <random>
+#include <memory>
 
 struct Location
 {
@@ -18,42 +19,8 @@ struct Location
 
 struct SerializedPlayer
 {
-	char* data{};
+	std::unique_ptr<char*> data{};
 	int size{};
-
-	SerializedPlayer() {};
-	// rule of five
-	SerializedPlayer(const SerializedPlayer& other) { *this = other; }
-	SerializedPlayer(SerializedPlayer&& other) { *this = std::move(other); }
-	SerializedPlayer& operator=(SerializedPlayer&& other) noexcept // move-assignment
-	{
-		if (this != &other)
-		{
-			size = other.size;
-			delete[] data;
-			data = other.data;
-			other.data = nullptr;
-			other.size = 0;
-		}
-		return *this;
-	};
-	SerializedPlayer& operator=(const SerializedPlayer& other) // copy-assignment
-	{
-		if (this != &other)
-		{
-			size = other.size;
-			delete[] data;
-			data = new char[size];
-			memcpy(data, other.data, size);
-		}
-		return *this;
-	}
-	
-	~SerializedPlayer()
-	{
-		delete[] data;
-	}
-
 };
 
 struct Player
@@ -83,8 +50,8 @@ SerializedPlayer player_serializer(const Player& player)
 	SerializedPlayer sp{};
 	sp.size = sizeof(Player);
 	size_t name_size = player.name.length();
-	sp.data = new char[sp.size];
-	char* auxptr = sp.data;
+	sp.data = std::make_unique<char*>(new char[sp.size]);
+	char* auxptr = *sp.data;
 	memcpy(auxptr, &name_size, sizeof(size_t));
 	auxptr += sizeof(size_t);
 	memcpy(auxptr, player.name.c_str(), player.name.size());

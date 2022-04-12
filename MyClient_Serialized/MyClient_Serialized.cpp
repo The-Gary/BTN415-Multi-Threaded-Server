@@ -65,7 +65,7 @@ void main()
 		z = rand_float(0, 10);
 		this_player.location.x = x; this_player.location.y = y; this_player.location.z = z;
 		SerializedPlayer sp = player_serializer(this_player);
-		send(ClientSocket, sp.data, sp.size, 0);
+		send(ClientSocket, *sp.data, sp.size, 0);
 		char s[1]{};
 		recv(ClientSocket, s, 1, 0);
 		size_t data_size = std::strtol(s, NULL, 10);

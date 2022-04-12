@@ -20,6 +20,40 @@ struct SerializedPlayer
 {
 	char* data{};
 	int size{};
+
+	SerializedPlayer() {};
+	// rule of five
+	SerializedPlayer(const SerializedPlayer& other) { *this = other; }
+	SerializedPlayer(SerializedPlayer&& other) { *this = std::move(other); }
+	SerializedPlayer& operator=(SerializedPlayer&& other) noexcept // move-assignment
+	{
+		if (this != &other)
+		{
+			size = other.size;
+			delete[] data;
+			data = other.data;
+			other.data = nullptr;
+			other.size = 0;
+		}
+		return *this;
+	};
+	SerializedPlayer& operator=(const SerializedPlayer& other) // copy-assignment
+	{
+		if (this != &other)
+		{
+			size = other.size;
+			delete[] data;
+			data = new char[size];
+			memcpy(data, other.data, size);
+		}
+		return *this;
+	}
+	
+	~SerializedPlayer()
+	{
+		delete[] data;
+	}
+
 };
 
 struct Player
@@ -37,14 +71,14 @@ struct Player
 
 	void print() const
 	{
-		std::cout  << "Coordinates for [" << std::setw(10) << this->name << "] are [X: " << std::setprecision(2) << std::fixed;
+		std::cout << "Coordinates for [" << std::setw(10) << this->name << "] are [X: " << std::setprecision(2) << std::fixed;
 		std::cout << std::setw(4) << this->location.x << " | Y: ";
 		std::cout << std::setw(4) << this->location.y << " | Z: ";
 		std::cout << std::setw(4) << this->location.z << "]" << std::endl;
 	}
 };
 
-SerializedPlayer& player_serializer(const Player& player)
+SerializedPlayer player_serializer(const Player& player)
 {
 	SerializedPlayer sp{};
 	sp.size = sizeof(Player);

@@ -64,7 +64,7 @@ void main()
 		y = rand_float(0, 10);
 		z = rand_float(0, 10);
 		this_player.location.x = x; this_player.location.y = y; this_player.location.z = z;
-		SerializedPlayer& sp = player_serializer(this_player);
+		SerializedPlayer sp = player_serializer(this_player);
 		send(ClientSocket, sp.data, sp.size, 0);
 		char s[1]{};
 		recv(ClientSocket, s, 1, 0);
@@ -95,7 +95,7 @@ void main()
 				recv_buffer += sizeof(Player);
 			}
 		}
-		delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
+		// delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
 		delete[] buffer_begin;
 		buffer_begin = nullptr;
 		std::this_thread::sleep_for(std::chrono::seconds(1));

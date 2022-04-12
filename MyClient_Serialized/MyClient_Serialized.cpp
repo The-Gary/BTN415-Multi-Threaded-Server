@@ -70,10 +70,8 @@ void main()
 		recv(ClientSocket, s, 1, 0);
 		size_t data_size = std::strtol(s, NULL, 10);
 		send(ClientSocket, "ack", 3, 0);
-		// recv_buffer = new char[data_size * sizeof(Player)];
 		std::unique_ptr<char*> recv_buffer = std::make_unique<char*>(new char[data_size * sizeof(Player)]{});
 		recv(ClientSocket, *recv_buffer, data_size * sizeof(Player), 0);
-		// char* buffer_begin = *recv_buffer;
 		for (int i = 0; i < data_size; i++)
 		{
 			if (std::strlen(*recv_buffer) > 0)
@@ -96,8 +94,6 @@ void main()
 				*recv_buffer += sizeof(Player);
 			}
 		}
-		// delete[] buffer_begin;
-		// buffer_begin = nullptr;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		++count;
 	}

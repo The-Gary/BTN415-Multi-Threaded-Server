@@ -57,13 +57,13 @@ void handle_client(int idx)
 	while (recv(ClientSockets[idx], recv_buffer, sizeof(Player), 0) != 0)
 	{
 		Player player = player_deserializer(recv_buffer);
-		auto& name = player.name;
+		auto& const name = player.name;
 		auto found = std::find_if(players.begin(), players.end(), [&name](const Player* player)
 			{
 				return name == player->name;
 			});
 		const std::lock_guard<std::mutex> guard(myMutex);
-		if (found == players.cend()) // player doesn't exist in the player vector
+		if (found == players.cend()) // player doesn't exist in the players vector
 		{
 			std::memcpy(*new_player, &player, sizeof(Player));
 			players.push_back(*new_player);
@@ -84,8 +84,7 @@ void handle_client(int idx)
 		{
 			if (player->name != (*new_player)->name)
 			{
-				SerializedPlayer sp{};
-				sp = player_serializer(*player);
+				SerializedPlayer sp = player_serializer(*player);
 				std::memcpy(*send_buffer, *sp.data, sp.size);
 				*send_buffer += sp.size;
 			}

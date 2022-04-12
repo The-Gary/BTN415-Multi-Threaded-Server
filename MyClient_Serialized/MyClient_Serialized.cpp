@@ -70,14 +70,15 @@ void main()
 		recv(ClientSocket, s, 1, 0);
 		size_t data_size = std::strtol(s, NULL, 10);
 		send(ClientSocket, "ack", 3, 0);
-		recv_buffer = new char[data_size * sizeof(Player)];
-		recv(ClientSocket, recv_buffer, data_size * sizeof(Player), 0);
-		char* buffer_begin = recv_buffer;
+		// recv_buffer = new char[data_size * sizeof(Player)];
+		std::unique_ptr<char*> recv_buffer = std::make_unique<char*>(new char[data_size * sizeof(Player)]{});
+		recv(ClientSocket, *recv_buffer, data_size * sizeof(Player), 0);
+		// char* buffer_begin = *recv_buffer;
 		for (int i = 0; i < data_size; i++)
 		{
-			if (std::strlen(recv_buffer) > 0)
+			if (std::strlen(*recv_buffer) > 0)
 			{
-				Player recv_player = player_deserializer(recv_buffer);
+				Player recv_player = player_deserializer(*recv_buffer);
 				auto& const name = recv_player.name;
 				auto found = std::find_if(other_players.begin(), other_players.end(), [&name](const Player* player)
 					{
@@ -92,11 +93,11 @@ void main()
 				else
 					other_players.push_back(&recv_player);
 
-				recv_buffer += sizeof(Player);
+				*recv_buffer += sizeof(Player);
 			}
 		}
-		delete[] buffer_begin;
-		buffer_begin = nullptr;
+		// delete[] buffer_begin;
+		// buffer_begin = nullptr;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		++count;
 	}

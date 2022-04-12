@@ -95,7 +95,6 @@ void main()
 				recv_buffer += sizeof(Player);
 			}
 		}
-		// delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
 		delete[] buffer_begin;
 		buffer_begin = nullptr;
 		std::this_thread::sleep_for(std::chrono::seconds(1));

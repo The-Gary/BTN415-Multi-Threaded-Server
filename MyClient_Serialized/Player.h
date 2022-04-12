@@ -66,13 +66,12 @@ Player player_deserializer(const char* auxptr)
 	size_t name_size = 0;
 	memcpy(&name_size, auxptr, sizeof(size_t));
 	auxptr += sizeof(size_t);
-	char* name = new char[name_size];
-	memcpy(name, auxptr, name_size);
-	auto s_name = std::string(name, name_size);
+	std::unique_ptr<char*> name = std::make_unique<char*>(new char[name_size]);
+	memcpy(*name, auxptr, name_size);
+	auto s_name = std::string(*name, name_size);
 	player.name = s_name;
 	auxptr += name_size;
 	memcpy(&player.location, auxptr, sizeof(Location));
-	delete[] name;
 	return player;
 };
 

@@ -51,6 +51,7 @@ void handle_client(int idx)
 	Active_Sockets[idx] = true;
 	int count = 0;
 	char recv_buffer[sizeof(Player)] = {};
+	std::unique_ptr<char*> send_buffer(new char* {});
 	
 	std::unique_ptr<Player*> new_player(std::make_unique<Player*>(new Player));
 	while (recv(ClientSockets[idx], recv_buffer, sizeof(Player), 0) != 0)
@@ -76,9 +77,8 @@ void handle_client(int idx)
 		}
 		
 		auto data_size = sizeof(Player) * players.size();
-		char* send_buffer{};
-		send_buffer = new char[data_size] {};
-		char* buffer_begin = send_buffer;
+		send_buffer = std::make_unique<char*>(new char[data_size] {});
+		char* buffer_begin = *send_buffer;
 
 		for (auto& player : players)
 		{
@@ -86,11 +86,11 @@ void handle_client(int idx)
 			{
 				SerializedPlayer sp{};
 				sp = player_serializer(*player);
-				std::memcpy(send_buffer, *sp.data, sp.size);
-				send_buffer += sp.size;
+				std::memcpy(*send_buffer, *sp.data, sp.size);
+				*send_buffer += sp.size;
 			}
 		}
-		send_buffer = buffer_begin;
+		*send_buffer = buffer_begin;
 
 		size_t size = players.size();
 		char size_str[10]{};
@@ -102,8 +102,7 @@ void handle_client(int idx)
 			recv(ClientSockets[idx], temp, 3, 0);
 		}
 		
-		send(ClientSockets[idx], send_buffer, data_size, 0);
-		delete[] send_buffer;
+		send(ClientSockets[idx], *send_buffer, data_size, 0);
 		++count;
 	}
 	cout << (*new_player)->name + ": communication finished..." << endl;

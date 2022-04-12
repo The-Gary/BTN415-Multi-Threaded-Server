@@ -30,9 +30,7 @@ void main()
 	// starts Winsock DLLs
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0)
-	{
 		return;
-	}
 
 	// initializes socket. SOCK_STREAM: TCP
 	SOCKET ClientSocket;
@@ -44,7 +42,7 @@ void main()
 	}
 
 	// Connect socket to specified server
-	sockaddr_in SvrAddr;
+	sockaddr_in SvrAddr{};
 	SvrAddr.sin_family = AF_INET;						// Address family type itnernet
 	SvrAddr.sin_port = htons(27000);					// port (host to network conversion)
 	SvrAddr.sin_addr.s_addr = inet_addr("127.0.0.1");	// IP address
@@ -66,7 +64,7 @@ void main()
 		y = rand_float(0, 10);
 		z = rand_float(0, 10);
 		this_player.location.x = x; this_player.location.y = y; this_player.location.z = z;
-		auto sp = player_serializer(this_player);
+		SerializedPlayer sp = player_serializer(this_player);
 		send(ClientSocket, sp.data, sp.size, 0);
 		char s[1]{};
 		recv(ClientSocket, s, 1, 0);
@@ -97,6 +95,7 @@ void main()
 				recv_buffer += sizeof(Player);
 			}
 		}
+		// delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
 		delete[] buffer_begin;
 		buffer_begin = nullptr;
 		std::this_thread::sleep_for(std::chrono::seconds(1));

@@ -84,9 +84,10 @@ void handle_client(int idx)
 		{
 			if (player->name != (*new_player)->name)
 			{
-				SerializedPlayer sp = player_serializer(*player);
+				SerializedPlayer sp{};
+				sp = player_serializer(*player);
 				std::memcpy(send_buffer, sp.data, sp.size);
-				delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
+				//delete[] sp.data; // frees the memory allocated for data from SerilaizerPlayer class... if rule of five is implement for SerialziedPlayer, this can be moved to the dtor
 				send_buffer += sp.size;
 			}
 		}

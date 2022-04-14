@@ -16,7 +16,10 @@ March 11, 2022
 #include <chrono>
 #include <algorithm>
 #include <mutex>
-#include "../MyClient_Serialized/Player.h"
+#include "Player.h"
+#include "SerializedPlayer.h"
+
+using namespace sdds;
 
 using std::cout;
 using std::endl;
@@ -56,7 +59,7 @@ void handle_client(int idx)
 	std::unique_ptr<Player*> new_player(std::make_unique<Player*>(new Player));
 	while (recv(ClientSockets[idx], recv_buffer, sizeof(Player), 0) != 0)
 	{
-		Player player = player_deserializer(recv_buffer);
+		Player player = SerializedPlayer::player_deserializer(recv_buffer);
 		auto& const name = player.name;
 		auto found = std::find_if(players.begin(), players.end(), [&name](const Player* player)
 			{
@@ -73,7 +76,7 @@ void handle_client(int idx)
 		{
 			(*found)->location.update_loc(player.location.x, player.location.y, player.location.z);
 			cout << std::left << std::setw(3) << count << " - ";
-			(*found)->print();
+			printPlayerInfo(*found);
 		}
 		
 		auto data_size = sizeof(Player) * players.size();
@@ -84,7 +87,7 @@ void handle_client(int idx)
 		{
 			if (player->name != (*new_player)->name)
 			{
-				SerializedPlayer sp = player_serializer(*player);
+				SerializedPlayer sp = SerializedPlayer::player_serializer(*player);
 				std::memcpy(*send_buffer, *sp.data, sp.size);
 				*send_buffer += sp.size;
 			}

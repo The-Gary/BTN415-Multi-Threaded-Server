@@ -14,9 +14,10 @@ March 18, 2022
 #include <string>
 #include <thread>
 #include <vector>
-#include "../MyClient_Serialized/Player.h"
+#include "Player.h"
+#include "SerializedPlayer.h"
 
-
+using namespace sdds;
 using std::cout;
 using std::cin;
 using std::endl;
@@ -64,7 +65,7 @@ void main()
 		y = rand_float(0, 10);
 		z = rand_float(0, 10);
 		this_player.location.x = x; this_player.location.y = y; this_player.location.z = z;
-		SerializedPlayer sp = player_serializer(this_player);
+		SerializedPlayer sp = SerializedPlayer::player_serializer(this_player);
 		send(ClientSocket, *sp.data, sp.size, 0);
 		char s[1]{};
 		recv(ClientSocket, s, 1, 0);
@@ -76,7 +77,7 @@ void main()
 		{
 			if (std::strlen(*recv_buffer) > 0)
 			{
-				Player recv_player = player_deserializer(*recv_buffer);
+				Player recv_player = SerializedPlayer::player_deserializer(*recv_buffer);
 				auto& const name = recv_player.name;
 				auto found = std::find_if(other_players.begin(), other_players.end(), [&name](const Player* player)
 					{
@@ -86,7 +87,7 @@ void main()
 				{
 					(**found).location.update_loc(recv_player.location.x, recv_player.location.y, recv_player.location.z);
 					cout << std::left << std::setw(3) << count << " - ";
-					(**found).print();
+					printPlayerInfo(*found);
 				}
 				else
 					other_players.push_back(&recv_player);

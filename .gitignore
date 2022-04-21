@@ -40,5 +40,8 @@ x64/
 Debug/
 MyClient*/
 MyServer*/
+!MyServer_Serialized/
+!MyClient_Serialized/
+!MyClient2/
 *.vcxproj.filters
 *.vcxproj.user
